@@ -54,3 +54,57 @@ export const getUserProjects = async (userId) => {
 
   return projects;
 };
+
+// export const searchProjects = async({userId, title, projectId}) => {
+//   const userAccess = {
+//     [Op.or] : [
+//       {createdBy : userId},
+//       {
+//         id : {
+//           [Op.in] : db.Sequelize.literal(`(
+//             SELECT "projectId"
+//             FROM "ProjectMembers3"
+//             WHERE "projectMember" = ${userId} AND "isDeleted" = false
+//           )`)
+//         }
+//       }
+//     ]
+//   };
+//   const titleCondition = {
+//     title : {[Op.iLike] : `%${title || ''}%`}
+//   };
+
+//   const combineConditions = {
+//     isDeleted : false,
+//     [Op.and] : [userAccess, titleCondition]
+//   };
+
+//   if(projectId){
+//     combineConditions[Op.and].push({id : projectId});
+//   };
+
+//   return await db.Project.findAll({where : combineConditions});
+// };
+
+export const searchProjects = async(userId, title) => {
+  if(!userId || !title) throw new Error('UserID and title are required');
+
+  const projects = await db.Project.findAll({
+    where : {
+      isDeleted : false,
+      title : {[Op.iLike] : `%${title}%`},
+      [Op.or] : [
+        {createdBy : userId},
+        {
+          id: {
+            [Op.in] : db.sequelize.literal(`(
+              SELECT "projectId" FROM "ProjectMembers3"
+              WHERE "projectMember" = ${userId} AND "isDeleted" = false
+            )`)
+          }
+        }
+      ]
+    }
+  });
+  return projects;
+};
