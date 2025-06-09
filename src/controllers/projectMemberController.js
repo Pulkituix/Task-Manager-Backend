@@ -4,17 +4,25 @@ export const create = async (req, res, next) => {
   try {
     const { projectId, projectMember, role } = req.body;
     const createdBy = req.user.id;
+
+    if (!projectId || !projectMember || !role) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     const member = await memberService.addProjectMember({
       projectId,
       createdBy,
       projectMember,
       role,
     });
+
     res.status(201).json({ message: 'Member added', member });
   } catch (err) {
+    console.error('Controller Error:', err); // Log the error
     next(err);
   }
 };
+
 
 export const getAll = async (req, res, next) => {
   try {

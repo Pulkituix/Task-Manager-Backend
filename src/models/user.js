@@ -19,6 +19,11 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       }
+      // },
+      // isVerified : {
+      //   type : DataTypes.BOOLEAN,
+      //   defaultValue : false
+      // }
     },
     {
       sequelize,
@@ -26,7 +31,7 @@ export default (sequelize, DataTypes) => {
       tableName: 'Users',
       timestamps : true,
       hooks: {
-        beforeCreate: async (user, options) => {
+        beforeCreate: async (user) => {
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
         }
@@ -36,5 +41,3 @@ export default (sequelize, DataTypes) => {
 
   return User;
 };
-
-// composite unique index on projectId, memberId in project members table

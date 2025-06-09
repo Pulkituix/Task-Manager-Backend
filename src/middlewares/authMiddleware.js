@@ -8,7 +8,8 @@ export const authenticate = (req, res, next) => {
     if(!authHeader){
         return res.status(401).json({error : 'No token provided 1'});
     }
-    else if(!authHeader.startsWith('Bearer ')){
+
+    if(!authHeader.startsWith('Bearer ')){
         return res.status(401).json({error : 'No token provided 2'})
     }
 
@@ -16,7 +17,8 @@ export const authenticate = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
+        if(!decoded.id) return res.status(401).json({error : 'Invalid token payload(missing ID)'})
+        req.user = {id : decoded.id};
         next();
     } catch (error) {
         return res.status(401).json({error : 'Invalid or expired token'})

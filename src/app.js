@@ -4,7 +4,8 @@ import express from 'express';
 import authRouter from './routes/auth.js';
 import db from './models/index.js';
 import projectRouter from './routes/projectRoutes.js';
-import projectMembersRouter from './routes/projectMembersRoute.js'
+import projectMembersRouter from './routes/projectMembersRoute.js';
+import taskRouter from './routes/taskRoutes.js';
 
 const app = express()
 const port = process.env.PORT;
@@ -17,9 +18,11 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 
-app.use('/api/project', projectRouter)
+app.use('/api/project', projectRouter);
 
-app.use('/api/projectMembers', projectMembersRouter)
+app.use('/api/projectMembers', projectMembersRouter);
+
+app.use('/api/task', taskRouter);
 
 db.sequelize.sync()
   .then(() => {

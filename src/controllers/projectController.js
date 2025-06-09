@@ -83,3 +83,17 @@ export const getMyProjects = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+export const searchProjects = async(req, res) => {
+  try {
+    const userId = req.user?.id;
+    // const {title, projectId} = req.query;
+    const {title} = req.query;
+    // const projects = await projectService.searchProjects(userId, title, projectId);
+    const projects = await projectService.searchProjects(userId, title);
+    res.status(200).json({message : 'Projects fetched successfully', projects})
+  } catch (error) {
+    console.error('Error', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
