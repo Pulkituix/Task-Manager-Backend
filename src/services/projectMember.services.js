@@ -1,33 +1,18 @@
-import db from '../models/index.js';
+import { addProjectMemberRepo, getMembersByProjectRepo, removeProjectMemberRepo, softDelete } from '../repositories/projectMember.repository.js';
 
 export const addProjectMember = async (data) => {
-  try {
-    return await db.ProjectMember.create(data);
-  } catch (err) {
-    console.error('Error adding project member:', err); // Log the error
-    throw err;
-  }
+  return await addProjectMemberRepo(data);
 };
 
 
 export const getMembersByProject = async (projectId) => {
-  return await db.ProjectMember.findAll({
-    where: { projectId, isDeleted: false },
-  });
+  return await getMembersByProjectRepo(projectId);
 };
 
 export const removeProjectMember = async (projectId, memberId) => {
-  const member = await db.ProjectMember.findOne({
-    where: {
-      projectId,
-      projectMember: memberId,
-      isDeleted: false,
-    },
-  });
+  const member = await removeProjectMemberRepo(projectId,memberId);
 
   if (!member) return null;
 
-  member.isDeleted = true;
-  await member.save();
-  return member;
+  return await softDelete(member);
 };

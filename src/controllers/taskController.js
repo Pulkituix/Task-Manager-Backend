@@ -6,7 +6,7 @@ export const createTask = async(req, res) => {
         const createdBy = req.user.id;
         const data = {...req.body, createdBy};
 
-        const task = await taskService.createTask(data);
+        const task = await taskService.createTaskService(data);
         res.status(201).json({message : 'Task created successfully', task});
     }
     catch(error){

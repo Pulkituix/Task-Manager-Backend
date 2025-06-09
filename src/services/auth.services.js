@@ -1,25 +1,24 @@
-import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '../utils/mailer.js';
 import { generateOtp, checkExpired } from '../utils/otp.js';
-import { where } from 'sequelize';
+import { findUserByEmail, createUser, updateUserVerification , updatePassword} from '../repositories/user.repository.js';
+import { createOtp, otpByEmail, deleteOtp } from '../repositories/otp.repository.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const registerUser = async (name, email, password) => {
-  const existingUser = await db.User.findOne({ where: { email } });
+  const existingUser = await findUserByEmail(email);
   if (existingUser) {
     throw new Error('Email already in use');
   }
-
-  const user = await db.User.create({ name, email, password });
+  const user = await createUser({ name, email, password });
 
   const code = generateOtp();
 
   const expiresIn = new Date(Date.now() + 10 * 60 * 1000);
 
-  await db.Otp.create({email, otp : code, expiresAt : expiresIn});
+  await createOtp({email, otp : code, expiresAt : expiresIn});
 
   const subject = 'Welcome to Task Manager, Verify your Email';
   const html = `<p>Your OTP is : <b>${code}</b></p>`;
@@ -29,16 +28,16 @@ export const registerUser = async (name, email, password) => {
 };
 
 export const verifyOtp = async(email, otp) => {
-  const OTP = await db.Otp.findOne({where : {email, otp}, order : [['createdAt', 'DESC']]});
+  const OTP = await otpByEmail(email,otp);
 
   if(!OTP || checkExpired(OTP.expiredAt)) throw new Error('Invalid or Expired OTP');
 
-  await db.User.update({isVerified : true}, {where : {email}});
-  await db.Otp.destroy({where : {email}});
+  await updateUserVerification(email);
+  await deleteOtp(email);
 }
 
 export const loginUser = async (email, password) => {
-  const user = await db.User.findOne({ where: { email } });
+  const user = await findUserByEmail(email);
   if (!user) {
     throw new Error('Invalid credentials');
   }
@@ -56,24 +55,24 @@ export const loginUser = async (email, password) => {
 };
 
 export const forgotPasswordOtp = async(email) => {
-  const user = await db.User.findOne({where : {email}});
+  const user = await findUserByEmail(email);
   if(!user) throw new Error('Email not registered');
 
   const code = generateOtp();
   const expiresIn = new Date(Date.now() + 10*60*1000);
 
-  await db.Otp.create({email, otp : code, expiresAt : expiresIn});
+  await createOtp({email, otp : code, expiresAt : expiresIn});
   await sendMail(email, 'Reset Password OTP', `<p>Your OTP : <b>${code}</b></p>`)
 };
 
 export const resetPasswordUsingOtp = async(email,otp,newPassword) => {
-  const sentOtp = await db.Otp.findOne({where : {email,otp}, order : [['createdAt','DESC']]});
+  const sentOtp = await otpByEmail(email,otp)
 
   if(!sentOtp || checkExpired(sentOtp.expiredAt)){
     throw new Error('Invalid or Expired OTP');
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await db.User.update({password : hashedPassword}, {where : {email}});
-  await db.Otp.destroy({where : {email}});
+  await updatePassword(email,hashedPassword);
+  await deleteOtp(email);
 }

@@ -18,17 +18,16 @@ export default (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      isVerified : {
+        type : DataTypes.BOOLEAN,
+        defaultValue : false
       }
-      // },
-      // isVerified : {
-      //   type : DataTypes.BOOLEAN,
-      //   defaultValue : false
-      // }
     },
     {
       sequelize,
       modelName: 'User',
-      tableName: 'Users',
+      tableName: 'Users1',
       timestamps : true,
       hooks: {
         beforeCreate: async (user) => {
