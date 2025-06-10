@@ -30,23 +30,6 @@ export async function deleteProject(projectId, userId){
   }
 };
 
-// export async function deleteTask(taskId,userId){
-//     try{
-//         const task = await taskRepo.getTaskById(taskId);
-
-//         if(!task) return {status : 404, message : 'Task not found'};
-
-//         if(task.createdBy != userId) return {status : 403, message : "Permission denied"};
-
-//         await taskRepo.softDelete(task);
-
-//         return{status : 200, message : "Task deleted"};
-//     }
-//     catch(error){
-//         console.error('Error', error);
-//         return {status : 500, message : 'Internal server error'};
-//     }
-// }
 
 export async function getUserProjects(userId){
   return await projectRepo.getUserProjects(userId);
