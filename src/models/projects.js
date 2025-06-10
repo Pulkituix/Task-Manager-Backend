@@ -31,6 +31,10 @@ export default (sequelize, DataTypes) => {
       createdBy: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Users1', // 👈 Must match your actual table name
+          key: 'id',       // 👈 The key in Users1 table you are referencing
+        },
       },
       isDeleted: { 
         type: DataTypes.BOOLEAN, 

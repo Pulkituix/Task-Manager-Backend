@@ -1,23 +1,33 @@
 import db from "../models/index.js";
 import { Op } from "sequelize";
 
-export const createProjectRepo = async (data) => {
+export async function createProject(data){
   return await db.Project.create(data);
 };
 
-export const getProjectsByUserRepo = async (userId) => {
+// Example repository function
+// export async function createProjectRepo (data) {
+//   try {
+//     const project = await db.Project.create(data);
+//     return project;
+//   } catch (error) {
+//     console.error('❌ Sequelize Error Message:', error.message);
+//     throw error;
+//   }
+// };
+export async function getProjectsByUser(userId) {
   return await db.Project.findAll({ where: { createdBy: userId , isDeleted : false} });
 };
 
-export const getProjectByIdRepo = async (id, userId) => {
+export async function getProjectById(id, userId) {
   return await db.Project.findOne({ where: { id, createdBy: userId , isDeleted : false} });
 };
 
-export const updateProjectRepo = async (id, data, userId) => {
+export async function updateProject(id, data, userId){
   return await db.Project.update(data, { where: { id, createdBy: userId , isDeleted : false} });
 };
 
-export const findProjectByIdAndUser = async (projectId, userId) => {
+export async function findProjectByIdAndUser(projectId, userId){
   return await db.Project.findOne({
     where: {
       id: projectId,
@@ -27,12 +37,12 @@ export const findProjectByIdAndUser = async (projectId, userId) => {
   });
 };
 
-export const softDelete = async(project) => {
+export async function softDelete(project){
     project.isDeleted = true;
     return await project.save();
 };
 
-export const getUserProjectsRepo = async(userId) => {
+export async function getUserProjects(userId){
     return await db.Project.findAll({
     where: {
       isDeleted: false,
@@ -52,7 +62,7 @@ export const getUserProjectsRepo = async(userId) => {
   });
 }
 
-export const getProjectByTitle = async(userId, title) => {
+export async function getProjectByTitle(userId, title){
     return await db.Project.findAll({
         where : {
           isDeleted : false,

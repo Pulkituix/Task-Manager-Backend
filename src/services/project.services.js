@@ -1,31 +1,55 @@
-import {createProjectRepo, findProjectByIdAndUser, getProjectByIdRepo, getProjectsByUserRepo, softDelete, updateProjectRepo, getUserProjectsRepo, getProjectByTitle} from '../repositories/project.repository.js'
+import * as projectRepo from '../repositories/project.repository.js'
 
-export const createProject = async (data) => {
-  return await createProjectRepo(data);
+export async function createProject(data){
+  return await projectRepo.createProject(data);
 };
 
-export const getProjectsByUser = async (userId) => {
-  return await getProjectsByUserRepo(userId);
+export async function getProjectsByUser(userId){
+  return await projectRepo.getProjectsByUser(userId);
 }
 
-export const getProjectById = async (id, userId) => {
-  return await getProjectByIdRepo(id, userId)
+export async function getProjectById(id, userId){
+  return await projectRepo.getProjectById(id, userId)
 };
 
-export const updateProject = async (id, data, userId) => {
-  return await updateProjectRepo(id, data, userId)
+export async function updateProject(id, data, userId){
+  return await projectRepo.updateProject(id, data, userId)
 };
 
-export const deleteProject = async (projectId, userId) => {
-  const project = await findProjectByIdAndUser(projectId, userId)
+export async function deleteProject(projectId, userId){
+  try {
+    const project = await projectRepo.findProjectByIdAndUser(projectId, userId)
 
-  if (!project) return null;
+    if (!project) return null;
 
-  return await softDelete(project);
+    await projectRepo.softDelete(project);
+
+    return{status : 200, message : "Project Deleted"}
+  } catch (error) {
+    return{status : 500, message : 'Internal error server'}
+  }
 };
 
-export const getUserProjects = async (userId) => {
-  return await getUserProjectsRepo(userId);
+// export async function deleteTask(taskId,userId){
+//     try{
+//         const task = await taskRepo.getTaskById(taskId);
+
+//         if(!task) return {status : 404, message : 'Task not found'};
+
+//         if(task.createdBy != userId) return {status : 403, message : "Permission denied"};
+
+//         await taskRepo.softDelete(task);
+
+//         return{status : 200, message : "Task deleted"};
+//     }
+//     catch(error){
+//         console.error('Error', error);
+//         return {status : 500, message : 'Internal server error'};
+//     }
+// }
+
+export async function getUserProjects(userId){
+  return await projectRepo.getUserProjects(userId);
 };
 
 // export const searchProjects = async({userId, title, projectId}) => {
@@ -59,8 +83,8 @@ export const getUserProjects = async (userId) => {
 //   return await db.Project.findAll({where : combineConditions});
 // };
 
-export const searchProjects = async(userId, title) => {
+export async function searchProjects(userId, title){
   if(!userId || !title) throw new Error('UserID and title are required');
 
-  return await getProjectByTitle(userId, title);
+  return await projectRepo.getProjectByTitle(userId, title);
 };

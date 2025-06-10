@@ -1,18 +1,18 @@
-import { addProjectMemberRepo, getMembersByProjectRepo, removeProjectMemberRepo, softDelete } from '../repositories/projectMember.repository.js';
+import * as memberRepo from '../repositories/projectMember.repository.js';
 
-export const addProjectMember = async (data) => {
-  return await addProjectMemberRepo(data);
+export async function addProjectMember(data){
+  return await memberRepo.addProjectMember(data);
 };
 
 
-export const getMembersByProject = async (projectId) => {
-  return await getMembersByProjectRepo(projectId);
+export async function getMembersByProject(projectId){
+  return await memberRepo.getMembersByProject(projectId);
 };
 
-export const removeProjectMember = async (projectId, memberId) => {
-  const member = await removeProjectMemberRepo(projectId,memberId);
+export async function removeProjectMember(projectId, memberId){
+  const member = await memberRepo.removeProjectMember(projectId,memberId);
 
   if (!member) return null;
 
-  return await softDelete(member);
+  return await memberRepo.softDelete(member);
 };

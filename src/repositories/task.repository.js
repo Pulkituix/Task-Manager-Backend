@@ -1,27 +1,26 @@
-import { update } from '../controllers/projectController.js';
 import db from '../models/index.js';
 
-export const findProjectById = async(projectId) => {
+export async function findProjectById(projectId){
     return await db.Project.findOne({
     where: { id: projectId, isDeleted: false },
   });
 }
 
-export const findProjectMember = async(projectId, assignedToId) => {
+export async function findProjectMember(projectId, assignedToId) {
     return await db.ProjectMember.findOne({
     where: { projectId, projectMember: assignedToId, isDeleted: false },
   });
 }
 
-export const createTaskRepo = async(data) => {
+export async function createTask(data) {
     return await db.Task.create(data);
 }
 
-export const getTaskByIdRepo = async(taskId) => {
+export async function getTaskById(taskId) {
     return await db.Task.findOne({where : {id : taskId, isDeleted : false}});
 }
 
-export const updateTaskRepo = async(taskId, updates) => {
+export async function updateTask(taskId, updates) {
     const [count, [updatedTask]] = await db.Task.update(updates, {
     where: { id: taskId },
     returning: true,
@@ -29,12 +28,12 @@ export const updateTaskRepo = async(taskId, updates) => {
   return {count, updatedTask};
 }
 
-export const softDelete = async(task) => {
+export async function softDelete(task) {
     task.isDeleted = true;
     return await task.save();
 };
 
-export const isUserMember = async(projectId, userId) => {
+export async function isUserMember(projectId, userId) {
     return await db.ProjectMember.findOne({
         where : {
             projectId, projectMember : userId, isDeleted : false
@@ -42,7 +41,7 @@ export const isUserMember = async(projectId, userId) => {
     });
 }
 
-export const findTasks = async(projectId) => {
+export async function findTasks(projectId) {
     return await db.Task.findAll({
         where : {
             projectId,
@@ -51,13 +50,13 @@ export const findTasks = async(projectId) => {
     });
 }
 
-export const activeProjectMember = async(projectId, memberId) => {
+export async function activeProjectMember(projectId, memberId) {
     return await db.ProjectMember.findOne({where : {
         projectId, projectMember : memberId, isDeleted : false
     }});
 }
 
-export const taskByProjectAndMember = async(projectId, memberId) => {
+export async function taskByProjectAndMember(projectId, memberId) {
     return await db.Task.findAll({where : {
         projectId, assignedToId : memberId, isDeleted : false
     }});

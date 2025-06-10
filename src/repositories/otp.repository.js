@@ -1,16 +1,16 @@
 import db from '../models/index.js';
 
-export const createOtp = async(data) => {
+export async function createOtp(data){
     return await db.Otp.create(data);
 }
 
-export const otpByEmail = async(email,otp) => {
+export async function otpByEmail(email,otp){
     return await db.Otp.findOne({
     where: { email, otp },
     order: [['createdAt', 'DESC']]
   });
 };
 
-export const deleteOtp = async(email) => {
+export async function deleteOtp (email){
     return await db.Otp.destroy({where : {email}});
 };

@@ -1,6 +1,6 @@
 import * as memberService from '../services/projectMember.services.js';
 
-export const create = async (req, res, next) => {
+export async function create (req, res, next) {
   try {
     const { projectId, projectMember, role } = req.body;
     const createdBy = req.user.id;
@@ -24,7 +24,7 @@ export const create = async (req, res, next) => {
 };
 
 
-export const getAll = async (req, res, next) => {
+export async function getAll(req, res, next) {
   try {
     const members = await memberService.getMembersByProject(req.params.projectId);
     res.json(members);
@@ -33,7 +33,7 @@ export const getAll = async (req, res, next) => {
   }
 };
 
-export const remove = async (req, res, next) => {
+export async function remove (req, res, next){
   try {
     const { projectId, memberId } = req.params;
     const deleted = await memberService.removeProjectMember(projectId, memberId);

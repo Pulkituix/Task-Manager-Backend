@@ -1,6 +1,6 @@
 import db from '../models/index.js'
 
-export const addProjectMemberRepo = async(data) => {
+export async function addProjectMember(data) {
     try {
         return await db.ProjectMember.create(data);
     } catch (err) {
@@ -9,13 +9,13 @@ export const addProjectMemberRepo = async(data) => {
     }
 };
 
-export const getMembersByProjectRepo = async (projectId) => {
+export async function getMembersByProject(projectId) {
   return await db.ProjectMember.findAll({
     where: { projectId, isDeleted: false },
   });
 };
 
-export const removeProjectMemberRepo = async (projectId, memberId) => {
+export async function removeProjectMember(projectId, memberId) {
   return await db.ProjectMember.findOne({
     where: {
       projectId,
@@ -25,7 +25,7 @@ export const removeProjectMemberRepo = async (projectId, memberId) => {
   });
 }
 
-export const softDelete = async(member) => {
+export async function softDelete (member) {
     member.isDeleted = true;
     return await member.save();
 };
