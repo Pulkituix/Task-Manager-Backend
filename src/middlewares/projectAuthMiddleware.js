@@ -2,7 +2,7 @@ import db from '../models/index.js';
 
 export async function isProjectCreator(req, res, next) {
   try {
-    const projectId = req.params.projectId;
+    const projectId = req.params.id;
 
     if (!projectId) {
       return res.status(400).json({ error: 'Project ID is missing' });
