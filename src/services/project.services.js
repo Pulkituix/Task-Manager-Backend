@@ -66,8 +66,8 @@ export async function getUserProjects(userId){
 //   return await db.Project.findAll({where : combineConditions});
 // };
 
-export async function searchProjects(userId, title){
+export async function searchProjects(userId, title, projectId){
   if(!userId || !title) throw new Error('UserID and title are required');
 
-  return await projectRepo.getProjectByTitle(userId, title);
+  return await projectRepo.getProjectByTitle(userId, title, projectId);
 };

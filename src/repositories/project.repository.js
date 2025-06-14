@@ -62,22 +62,52 @@ export async function getUserProjects(userId){
   });
 }
 
-export async function getProjectByTitle(userId, title){
-    return await db.Project.findAll({
-        where : {
-          isDeleted : false,
-          title : {[Op.iLike] : `%${title}%`},
-          [Op.or] : [
-            {createdBy : userId},
-            {
-              id: {
-                [Op.in] : db.sequelize.literal(`(
-                  SELECT "projectId" FROM "ProjectMembers3"
-                  WHERE "projectMember" = ${userId} AND "isDeleted" = false
-                )`)
-              }
-            }
-          ]
-        }
-      });
+// export async function getProjectByTitle(userId, title){
+//     return await db.Project.findAll({
+//         where : {
+//           isDeleted : false,
+//           title : {[Op.iLike] : `%${title}%`},
+//           [Op.or] : [
+//             {createdBy : userId},
+//             {
+//               id: {
+//                 [Op.in] : db.sequelize.literal(`(
+//                   SELECT "projectId" FROM "ProjectMembers3"
+//                   WHERE "projectMember" = ${userId} AND "isDeleted" = false
+//                 )`)
+//               }
+//             }
+//           ]
+//         }
+//       });
+// }
+
+export async function getProjectByTitle(userId, title, projectId){
+  const whereClause = {
+    isDeleted : false,
+    [Op.or] : [
+      {createdBy : userId},
+      {'$projectMembers.projectMember$' : userId}
+    ]
+  };
+
+  if(title){
+    whereClause.title = {[Op.iLike] : `%${title}%`};
+  }
+
+  if(projectId){
+    whereClause.id = projectId;
+  }
+
+  const projects = await db.Project.findAll({
+    where : whereClause,
+    include : [{
+      model : db.ProjectMember,
+      as : 'projectMembers',
+      where : {isDeleted : false},
+      required : false
+    }]
+  });
+
+  return projects;
 }

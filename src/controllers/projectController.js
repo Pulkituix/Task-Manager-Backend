@@ -87,10 +87,10 @@ export async function getMyProjects(req, res) {
 export async function searchProjects (req, res) {
   try {
     const userId = req.user?.id;
-    // const {title, projectId} = req.query;
-    const {title} = req.query;
-    // const projects = await projectService.searchProjects(userId, title, projectId);
-    const projects = await projectService.searchProjects(userId, title);
+    const {title, projectId} = req.query;
+    // const {title} = req.query;
+    const projects = await projectService.searchProjects(userId, title, projectId);
+    // const projects = await projectService.searchProjects(userId, title);
     res.status(200).json({message : 'Projects fetched successfully', projects})
   } catch (error) {
     console.error('Error', error);
