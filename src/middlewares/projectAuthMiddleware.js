@@ -1,8 +1,8 @@
 import db from '../models/index.js';
 
-export const isProjectCreator = async (req, res, next) => {
+export async function isProjectCreator(req, res, next) {
   try {
-    const projectId = req.params.projectId;
+    const projectId = req.params.id;
 
     if (!projectId) {
       return res.status(400).json({ error: 'Project ID is missing' });
@@ -20,7 +20,7 @@ export const isProjectCreator = async (req, res, next) => {
   }
 };
 
-export const isProjectCreator2 = async (req, res, next) => {
+export async function isProjectCreator2(req, res, next) {
   const projectId = req.body.projectId || req.params.id;
 
   if (!projectId) {
@@ -35,7 +35,7 @@ export const isProjectCreator2 = async (req, res, next) => {
   next();
 };
 
-export const canUpdateProject = async (req, res, next) => {
+export async function canUpdateProject(req, res, next) {
   const projectId = req.params.id;
   const userId = req.user.id;
   const project = await db.Project.findByPk(projectId);

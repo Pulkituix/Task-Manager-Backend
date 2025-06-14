@@ -2,7 +2,7 @@ import db from '../models/index.js'
 import * as projectService from '../services/project.services.js';
 const ProjectModel = db.User;
 
-export const create = async (req, res, next) => {
+export async function create(req, res, next){
   try {
     const { title, description, status } = req.body;
     const userId = req.user?.id;
@@ -20,7 +20,7 @@ export const create = async (req, res, next) => {
   }
 };
 
-export const getAll = async (req, res, next) => {
+export async function getAll(req, res, next){
   try {
     const projects = await projectService.getProjectsByUser(req.user.id);
     res.json(projects);
@@ -29,7 +29,7 @@ export const getAll = async (req, res, next) => {
   }
 };
 
-export const getOne = async (req, res, next) => {
+export async function getOne(req, res, next){
   try {
     const project = await projectService.getProjectById(req.params.id, req.user.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
@@ -40,7 +40,7 @@ export const getOne = async (req, res, next) => {
   }
 };
 
-export const update = async (req, res, next) => {
+export async function update(req, res, next){
   try {
     const updated = await projectService.updateProject(req.params.id, req.body, req.user.id);
     if (updated[0] === 0) return res.status(404).json({ error: 'Project not found or unauthorized' });
@@ -51,7 +51,7 @@ export const update = async (req, res, next) => {
   }
 };
 
-export const remove = async (req, res, next) => {
+export async function remove(req, res, next){
   try {
     const projectId = req.params.id;
     const userId = req.user.id;
@@ -62,14 +62,14 @@ export const remove = async (req, res, next) => {
       return res.status(404).json({ error: 'Project not found or already deleted' });
     }
 
-    return res.status(200).json({ message: 'Project removed successfully' });
+    return res.status(deletedProject.status).json({ message: deletedProject.message });
   } catch (err) {
     next(err);
   }
 };
 
 
-export const getMyProjects = async (req, res) => {
+export async function getMyProjects(req, res) {
   try {
     const userId = req.user.id;
     const projects = await projectService.getUserProjects(userId);
@@ -84,13 +84,13 @@ export const getMyProjects = async (req, res) => {
   }
 };
 
-export const searchProjects = async(req, res) => {
+export async function searchProjects (req, res) {
   try {
     const userId = req.user?.id;
-    // const {title, projectId} = req.query;
-    const {title} = req.query;
-    // const projects = await projectService.searchProjects(userId, title, projectId);
-    const projects = await projectService.searchProjects(userId, title);
+    const {title, projectId} = req.query;
+    // const {title} = req.query;
+    const projects = await projectService.searchProjects(userId, title, projectId);
+    // const projects = await projectService.searchProjects(userId, title);
     res.status(200).json({message : 'Projects fetched successfully', projects})
   } catch (error) {
     console.error('Error', error);
