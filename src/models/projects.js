@@ -32,8 +32,8 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users1', // 👈 Must match your actual table name
-          key: 'id',       // 👈 The key in Users1 table you are referencing
+          model: 'Users1',
+          key: 'id',     
         },
       },
       isDeleted: { 

@@ -2,7 +2,13 @@ import { Model } from 'sequelize';
 import bcrypt from 'bcrypt';
 
 export default (sequelize, DataTypes) => {
-  class User extends Model {}
+  class User extends Model {
+    static associate(models) {
+      User.belongsToMany(models.Role, {through : 'UserRoles', foreignKey: 'userId' });
+      User.hasMany(models.Project,{foreignKey : 'createdBy'});
+      User.hasMany(models.Task,{foreignKey : 'createdBy'});
+    }
+  }
 
   User.init(
     {
@@ -22,6 +28,11 @@ export default (sequelize, DataTypes) => {
       isVerified : {
         type : DataTypes.BOOLEAN,
         defaultValue : false
+      },
+      roleId : {
+        type : DataTypes.INTEGER,
+        allowNull : false,
+        defaultValue : 6
       }
     },
     {
