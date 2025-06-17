@@ -1,26 +1,25 @@
-import db from "../models/index.js";
+import * as taskRepo from "../repositories/task.repository.js";
 
-export const createTask = async(data) => {
+export async function createTaskService(data){
     const {title, description, status, projectId, assignedToId, createdBy} = data;
 
-    const project = await db.Project.findOne({where : {id : projectId, isDeleted : false}});
+    const project = await taskRepo.findProjectById(projectId);
     if(!project) throw new Error('Project not Found');
 
     if(assignedToId){
-        const isProjectMember = await db.ProjectMember.findOne({where : {projectId, projectMember : assignedToId, isDeleted : false}});
+        const isProjectMember = await taskRepo.findProjectMember(projectId, assignedToId);
 
         if(!isProjectMember) throw new Error('Assignee is not the member of the project');
     }
 
-    const task = await db.Task.create({
+    const task = await taskRepo.createTask({
         title, description, status, projectId, assignedToId, createdBy
     });
     return task;
 };
 
-export const getTaskById = async(taskId, userId) => {
-    const task = await db.Task.findOne({where : {id : taskId, isDeleted : false}});
-
+export async function getTaskById(taskId, userId){
+    const task = await taskRepo.getTaskById(taskId);
     if(!task){
         return {status : 404, message : 'Task not found'}
     }
@@ -32,9 +31,9 @@ export const getTaskById = async(taskId, userId) => {
     return task;
 }
 
-export const updateTask = async(taskId, userId, updates) => {
+export async function updateTask(taskId, userId, updates){
     try {
-        const task = await db.Task.findOne({where : {id : taskId, isDeleted : false}});
+        const task = await taskRepo.getTaskById(taskId);
 
         if(!task){
             return {status : 404, message : 'Task not found'}
@@ -44,9 +43,9 @@ export const updateTask = async(taskId, userId, updates) => {
             return {status : 403, message : 'Permission denied'}
         }
 
-        const [count, [updatedTask]] = await db.Task.update(updates, {where : {id : taskId},returning : true});
+        const {count, updatedTask} = await taskRepo.updateTask(taskId,updates)
 
-        if(!count){
+        if(count == 0){
             return {status : 500, message : 'Failed to update'}
         }
         return {status : 200, task : updatedTask};
@@ -56,18 +55,17 @@ export const updateTask = async(taskId, userId, updates) => {
     }
 };
 
-export const deleteTask = async(taskId,userId) => {
+export async function deleteTask(taskId,userId){
     try{
-        const task = await db.Task.findOne({where : {id : taskId, isDeleted : false}});
+        const task = await taskRepo.getTaskById(taskId);
 
         if(!task) return {status : 404, message : 'Task not found'};
 
         if(task.createdBy != userId) return {status : 403, message : "Permission denied"};
 
-        task.isDeleted = true;
-        await task.save();
+        await taskRepo.softDelete(task);
 
-        return {status : 200, message : 'Task deleted successfully'};
+        return{status : 200, message : "Task deleted"};
     }
     catch(error){
         console.error('Error', error);
@@ -75,49 +73,26 @@ export const deleteTask = async(taskId,userId) => {
     }
 }
 
-export const getTaskByProjectId = async(projectId, userId) => {
-    const project = await db.Project.findOne({where : {id : projectId, isDeleted : false}});
+export async function getTaskByProjectId(projectId, userId){
+    const project = await taskRepo.findProjectById(projectId);
 
     if(!project) return {status : 404, message : 'Project not found'};
 
-    const isMember = await db.ProjectMember.findOne({
-        where : {
-            projectId,
-            projectMember : userId,
-            isDeleted : false
-        }
-    });
+    const isMember = taskRepo.isUserMember(projectId, userId);
 
     if(project.createdBy != userId && !isMember) return {status : 403, message : 'Permission denied'}
 
-    const tasks = await db.Task.findAll({
-        where : {
-            projectId,
-            isDeleted : false
-        }
-    });
+    const tasks = taskRepo.findTasks(projectId);
 
     return { status : 200, data : tasks};
 };
 
-export const getAssignedTask = async(projectId, memberId) => {
-    const isMember = await db.ProjectMember.findOne({
-        where : {
-            projectId,
-            projectMember : memberId,
-            isDeleted : false
-        }
-    });
+export async function getAssignedTask(projectId, memberId){
+    const isMember = await taskRepo.activeProjectMember(projectId, memberId);
 
     if(!isMember) return {status : 403, message : 'Permission denied'};
 
-    const tasks = await db.Task.findAll({
-        where : {
-            projectId,
-            assignedToId : memberId,
-            isDeleted : false
-        }
-    });
+    const tasks = await taskRepo.taskByProjectAndMember(projectId,memberId);
 
     return {status : 200, tasks};
 }
