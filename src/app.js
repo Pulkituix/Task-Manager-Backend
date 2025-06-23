@@ -6,6 +6,11 @@ import db from './models/index.js';
 import projectRouter from './routes/projectRoutes.js';
 import projectMembersRouter from './routes/projectMembersRoute.js';
 import taskRouter from './routes/taskRoutes.js';
+import roleRouter from './routes/role.js';
+import permissionRouter from './routes/permission.js';
+import userRoleRouter from './routes/userRole.js';
+import rolePermissionRouter from './routes/rolePermission.js';
+import userPermissionRouter from './routes/userPermissionProject.js';
 
 const app = express()
 const port = process.env.PORT;
@@ -23,6 +28,16 @@ app.use('/api/project', projectRouter);
 app.use('/api/projectMembers', projectMembersRouter);
 
 app.use('/api/task', taskRouter);
+
+app.use('/api/role', roleRouter);
+
+app.use('/api/permission', permissionRouter);
+
+app.use('/api/userRole', userRoleRouter);
+
+app.use('/api/rolePermission', rolePermissionRouter);
+
+app.use('/api/userPermissionProject', userPermissionRouter);
 
 db.sequelize.sync()
   .then(() => {

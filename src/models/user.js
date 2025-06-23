@@ -2,7 +2,14 @@ import { Model } from 'sequelize';
 import bcrypt from 'bcrypt';
 
 export default (sequelize, DataTypes) => {
-  class User extends Model {}
+  class User extends Model {
+    static associate(models) {
+      User.belongsToMany(models.Role, {through : 'UserRoles', foreignKey: 'userId' });
+      User.belongsToMany(models.Permission, { through: 'UserPermissions', foreignKey: 'userId' });
+      User.hasMany(models.Project,{foreignKey : 'createdBy'});
+      User.hasMany(models.Task,{foreignKey : 'createdBy'});
+    }
+  }
 
   User.init(
     {
@@ -18,17 +25,21 @@ export default (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      isVerified : {
+        type : DataTypes.BOOLEAN,
+        defaultValue : false
+      },
+      roleId : {
+        type : DataTypes.INTEGER,
+        allowNull : false,
+        defaultValue : 6
       }
-      // },
-      // isVerified : {
-      //   type : DataTypes.BOOLEAN,
-      //   defaultValue : false
-      // }
     },
     {
       sequelize,
       modelName: 'User',
-      tableName: 'Users',
+      tableName: 'Users1',
       timestamps : true,
       hooks: {
         beforeCreate: async (user) => {

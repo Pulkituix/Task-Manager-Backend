@@ -1,12 +1,12 @@
 
 import * as taskService from '../services/task.services.js';
 
-export const createTask = async(req, res) => {
+export async function createTask (req, res) {
     try{
         const createdBy = req.user.id;
         const data = {...req.body, createdBy};
 
-        const task = await taskService.createTask(data);
+        const task = await taskService.createTaskService(data);
         res.status(201).json({message : 'Task created successfully', task});
     }
     catch(error){
@@ -14,7 +14,7 @@ export const createTask = async(req, res) => {
     }
 };
 
-export const getTaskById = async(req, res) => {
+export async function getTaskById (req, res) {
     try{
         const taskId = req.params.id;
         const userId = req.user.id;
@@ -26,7 +26,7 @@ export const getTaskById = async(req, res) => {
     }
 }
 
-export const updateTask = async(req, res) => {
+export async function updateTask(req, res) {
     const taskId = req.params.id;
     const userId = req.user.id;
     const changes = req.body;
@@ -44,7 +44,7 @@ export const updateTask = async(req, res) => {
     }
 };
 
-export const deleteTask = async(req,res) => {
+export async function deleteTask(req,res) {
     try{
         const taskId = req.params.id;
         const userId = req.user.id;
@@ -57,7 +57,7 @@ export const deleteTask = async(req,res) => {
     }
 }
 
-export const getTaskByProjectId = async(req,res) => {
+export async function getTaskByProjectId (req,res) {
     try{
         const projectId = req.params.id;
         const userId = req.user.id;
@@ -74,7 +74,7 @@ export const getTaskByProjectId = async(req,res) => {
     }
 }
 
-export const getAssignedTask = async(req,res) => {
+export async function getAssignedTask (req,res) {
     try{
         const projectId = req.params.projectId;
         const memberId = req.params.memberId;

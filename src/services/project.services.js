@@ -1,58 +1,41 @@
-import db from '../models/index.js';
-import { Op } from 'sequelize';
+import * as projectRepo from '../repositories/project.repository.js'
 
-export const createProject = async (data) => {
-  return await db.Project.create(data);
+export async function createProject(data){
+  return await projectRepo.createProject(data);
 };
 
-export const getProjectsByUser = async (userId) => {
-  return await db.Project.findAll({ where: { createdBy: userId , isDeleted : false} });
+// export async function getProjectsByUser(userId){
+//   return await projectRepo.getProjectsByUser(userId);
+// }
+
+export async function getProjectById(id){
+  return await projectRepo.getProjectById(id)
 };
 
-export const getProjectById = async (id, userId) => {
-  return await db.Project.findOne({ where: { id, createdBy: userId , isDeleted : false} });
+export async function getAllProjects() {
+    return await projectRepo.getAllProjects();
+}
+
+export async function updateProject(id, data){
+  return await projectRepo.updateProject(id, data)
 };
 
-export const updateProject = async (id, data, userId) => {
-  return await db.Project.update(data, { where: { id, createdBy: userId , isDeleted : false} });
+export async function deleteProject(projectId){
+  try {
+    const project = await projectRepo.getProjectById(projectId);
+    if (!project) return null;
+
+    await projectRepo.softDelete(project);
+
+    return{status : 200, message : "Project Deleted"}
+  } catch (error) {
+    return{status : 500, message : 'Internal error server'}
+  }
 };
 
-export const deleteProject = async (projectId, userId) => {
-  const project = await db.Project.findOne({
-    where: {
-      id: projectId,
-      createdBy: userId,
-      isDeleted: false,
-    },
-  });
 
-  if (!project) return null;
-
-  project.isDeleted = true;
-  await project.save();
-  return project;
-};
-
-export const getUserProjects = async (userId) => {
-  const projects = await db.Project.findAll({
-    where: {
-      isDeleted: false,
-      [Op.or]: [
-        { createdBy: userId },
-        {'$projectMembers.projectMember$': userId}
-      ]
-    },
-    include: [
-      {
-        model: db.ProjectMember,
-        as: 'projectMembers',
-        where: {isDeleted: false},
-        required: false
-      }
-    ]
-  });
-
-  return projects;
+export async function getUserProjects(userId){
+  return await projectRepo.getUserProjects(userId);
 };
 
 // export const searchProjects = async({userId, title, projectId}) => {
@@ -86,25 +69,8 @@ export const getUserProjects = async (userId) => {
 //   return await db.Project.findAll({where : combineConditions});
 // };
 
-export const searchProjects = async(userId, title) => {
+export async function searchProjects(userId, title){
   if(!userId || !title) throw new Error('UserID and title are required');
 
-  const projects = await db.Project.findAll({
-    where : {
-      isDeleted : false,
-      title : {[Op.iLike] : `%${title}%`},
-      [Op.or] : [
-        {createdBy : userId},
-        {
-          id: {
-            [Op.in] : db.sequelize.literal(`(
-              SELECT "projectId" FROM "ProjectMembers3"
-              WHERE "projectMember" = ${userId} AND "isDeleted" = false
-            )`)
-          }
-        }
-      ]
-    }
-  });
-  return projects;
+  return await projectRepo.getProjectByTitle(userId, title);
 };
