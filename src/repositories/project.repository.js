@@ -5,36 +5,16 @@ export async function createProject(data){
   return await db.Project.create(data);
 };
 
-// Example repository function
-// export async function createProjectRepo (data) {
-//   try {
-//     const project = await db.Project.create(data);
-//     return project;
-//   } catch (error) {
-//     console.error('❌ Sequelize Error Message:', error.message);
-//     throw error;
-//   }
-// };
-export async function getProjectsByUser(userId) {
-  return await db.Project.findAll({ where: { createdBy: userId , isDeleted : false} });
+export async function getProjectById(id) {
+  return await db.Project.findOne({ where: { id, isDeleted : false} });
 };
 
-export async function getProjectById(id, userId) {
-  return await db.Project.findOne({ where: { id, createdBy: userId , isDeleted : false} });
-};
+export async function getAllProjects() {
+  return await db.Project.findAll({where : {isDeleted : false}});
+}
 
-export async function updateProject(id, data, userId){
-  return await db.Project.update(data, { where: { id, createdBy: userId , isDeleted : false} });
-};
-
-export async function findProjectByIdAndUser(projectId, userId){
-  return await db.Project.findOne({
-    where: {
-      id: projectId,
-      createdBy: userId,
-      isDeleted: false,
-    },
-  });
+export async function updateProject(id, data){
+  return await db.Project.update(data, { where: { id, isDeleted : false} });
 };
 
 export async function softDelete(project){

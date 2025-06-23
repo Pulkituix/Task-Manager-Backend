@@ -12,6 +12,10 @@ export default (sequelize, DataTypes) => {
         as : 'projectMembers',
         onDelete: 'CASCADE',
       });
+      Project.hasMany(models.Task, {
+        foreignKey: 'projectId',
+        onDelete: 'CASCADE',
+      });
     }
   }
 
@@ -45,7 +49,7 @@ export default (sequelize, DataTypes) => {
       sequelize,
       modelName: 'Project',
       tableName: 'Projects3',
-      timestamps: true,
+      timestamps: true, 
     }
   );
 

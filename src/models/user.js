@@ -5,6 +5,7 @@ export default (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.belongsToMany(models.Role, {through : 'UserRoles', foreignKey: 'userId' });
+      User.belongsToMany(models.Permission, { through: 'UserPermissions', foreignKey: 'userId' });
       User.hasMany(models.Project,{foreignKey : 'createdBy'});
       User.hasMany(models.Task,{foreignKey : 'createdBy'});
     }

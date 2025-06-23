@@ -4,22 +4,25 @@ export async function createProject(data){
   return await projectRepo.createProject(data);
 };
 
-export async function getProjectsByUser(userId){
-  return await projectRepo.getProjectsByUser(userId);
+// export async function getProjectsByUser(userId){
+//   return await projectRepo.getProjectsByUser(userId);
+// }
+
+export async function getProjectById(id){
+  return await projectRepo.getProjectById(id)
+};
+
+export async function getAllProjects() {
+    return await projectRepo.getAllProjects();
 }
 
-export async function getProjectById(id, userId){
-  return await projectRepo.getProjectById(id, userId)
+export async function updateProject(id, data){
+  return await projectRepo.updateProject(id, data)
 };
 
-export async function updateProject(id, data, userId){
-  return await projectRepo.updateProject(id, data, userId)
-};
-
-export async function deleteProject(projectId, userId){
+export async function deleteProject(projectId){
   try {
-    const project = await projectRepo.findProjectByIdAndUser(projectId, userId)
-
+    const project = await projectRepo.getProjectById(projectId);
     if (!project) return null;
 
     await projectRepo.softDelete(project);

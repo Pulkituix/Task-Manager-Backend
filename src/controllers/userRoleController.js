@@ -8,7 +8,7 @@ export async function assignRoleToUser(req, res) {
         return res.status(201).json(assigned);
     } catch (error) {
         return res.status(500).json({ message: error.message });
-    }
+    }x
 }
 
 export async function removeUserRole(req, res) {

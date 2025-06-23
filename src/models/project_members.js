@@ -30,7 +30,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      projectMember: {
+      projectMember: {  // references to user
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -50,8 +50,8 @@ export default (sequelize, DataTypes) => {
       timestamps: true,
       indexes : [
         {
-            unique : true,
-            fields : ['projectId', 'projectMember']
+          unique : true,
+          fields : ['projectId', 'projectMember']
         }
       ]
     }
